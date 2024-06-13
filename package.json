@@ -11,7 +11,11 @@
   "dependencies": {
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.4"
+    "next": "14.2.4",
+    "contentful": "^9.2.13",
+    "@contentful/rich-text-links": "^16.0.2",
+    "@contentful/rich-text-react-renderer": "^15.16.2",
+    "@contentful/rich-text-types": "^16.0.2"
   },
   "devDependencies": {
     "typescript": "^5",
