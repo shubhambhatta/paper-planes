@@ -42,7 +42,7 @@ jobs:
 
           # The maximum number of environments in current plan is 3
           if (( env_count <= 3 )); then
-            echo "Free environment is avaliable in the space, skipping deletion of oldest 'master' environment."
+            echo "Free environment is avaliable in the space, skipping deletion of oldest master environment."
             exit 0
           fi
 
@@ -56,8 +56,8 @@ jobs:
             oldest_master_environment=$(echo "$master_environments" | head -n 2 | tail -n 1 | awk '{print $2}')
           fi
 
-          # Delete the oldest 'master' environment
-          contentful space environment delete --environment-id $oldest_master_environment
+          # Delete the oldest master environment
+          contentful space environment delete --environment-id "$oldest_master_environment"
 
       - name: Create new environment
         run: |
