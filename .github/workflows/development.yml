@@ -20,14 +20,20 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
-      - name: Install Contentful CLI
-        run: npm install -g contentful-cli
-
       - name: Load Environment Variables
         run: echo "${{secrets.DEVELEOPMENT_SECERETS}}" > .env
 
+      - name: Install Contentful CLI
+        run: npm install -g contentful-cli
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Login to Contentful
+        run: contentful login --management-token ${{secrets.CONTENTFUL_CMA_TOKEN}}
+
+      - name: Show all spaces
+        run: contentful space environment list
 
       - name: Build
         run: npm run build
