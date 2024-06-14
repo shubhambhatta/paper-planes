@@ -30,7 +30,12 @@ jobs:
         run: npm ci
 
       - name: Login to Contentful
-        run: contentful login --management-token ${{secrets.CONTENTFUL_CMA_TOKEN}}
+        run: |
+          contentful login --management-token ${{secrets.CONTENTFUL_CMA_TOKEN}} &&
+          contentful space use --space-id ${{secrets.CONTENTFUL_SPACE_ID}}
+
+      - name: Create new environment
+        run: contentful space environment create --name master-2024-06-14 --environment-id master-2024-06-14
 
       - name: Show all spaces
         run: contentful space environment list
