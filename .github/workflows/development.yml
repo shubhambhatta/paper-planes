@@ -35,7 +35,9 @@ jobs:
           contentful space use --space-id ${{secrets.CONTENTFUL_SPACE_ID}}
 
       - name: Create new environment
-        run: contentful space environment create --name master-2024-06-14 --environment-id master-2024-06-14
+        run: |
+          TODAY=$(date +"%Y-%m-%d")
+          contentful space environment create --name master-$TODAY --environment-id master-$TODAY
 
       - name: Show all spaces
         run: contentful space environment list
