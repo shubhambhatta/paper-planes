@@ -49,7 +49,7 @@ jobs:
           master_environments=$(echo "$environments" | grep 'master' | sort)
 
           aliased_master_environment=$(echo "$master_environments" | grep 'active' | awk '{print $2}' | sed 's/\[active\]//g')
-          oldest_master_environment=$(echo "$master_environments" | head -n 1 | awk '{print $2})
+          oldest_master_environment=$(echo "$master_environments" | head -n 1 | awk '{print $2}')
 
           # If aliased and oldest master environments are the same, select the second oldest
           if [ "$aliased_master_environment" == "$oldest_master_environment" ]; then
