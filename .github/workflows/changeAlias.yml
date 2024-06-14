@@ -1,0 +1,40 @@
+name: Change Alias CI
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install Contentful CLI
+        run: npm install -g contentful-cli
+
+      - name: Login to Contentful
+        run: |
+          contentful login --management-token ${{secrets.CONTENTFUL_CMA_TOKEN}} &&
+          contentful space use --space-id ${{secrets.CONTENTFUL_SPACE_ID}}
+
+      - name: Set alias to latest enviornment
+        run: |
+          # Fetch the list of environments
+          environments=$(contentful space environment list)
+          master_environments=$(echo "$environments" | grep 'master' | sort)
+
+          latest_master_environment=$(echo "$master_environments" | tail -n 1 | awk '{print $2}')
+
+          # Delete the oldest master environment
+          contentful space environment-alias update --alias-id master --target-environment-id "$latest_master_environment"

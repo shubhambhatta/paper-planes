@@ -1,0 +1,68 @@
+name: Node.js CI
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Load Environment Variables
+        run: echo "${{secrets.DEVELEOPMENT_SECERETS}}" > .env
+
+      - name: Install Contentful CLI
+        run: npm install -g contentful-cli
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Login to Contentful
+        run: |
+          contentful login --management-token ${{secrets.CONTENTFUL_CMA_TOKEN}} &&
+          contentful space use --space-id ${{secrets.CONTENTFUL_SPACE_ID}}
+
+      - name: Fetch and delete oldest 'master' environment
+        run: |
+          # Fetch the list of environments
+          environments=$(contentful space environment list)
+          env_count=$(echo "$environments" | grep -E 'ready' | wc -l)
+
+          # The maximum number of environments in current plan is 3
+          if (( env_count <= 3 )); then
+            echo "Free environment is avaliable in the space, skipping deletion of oldest master environment."
+            exit 0
+          fi
+
+          master_environments=$(echo "$environments" | grep 'master' | sort)
+
+          aliased_master_environment=$(echo "$master_environments" | grep 'active' | awk '{print $2}' | sed 's/\[active\]//g')
+          oldest_master_environment=$(echo "$master_environments" | head -n 1 | awk '{print $2}')
+
+          # If aliased and oldest master environments are the same, select the second oldest
+          if [ "$aliased_master_environment" == "$oldest_master_environment" ]; then
+            oldest_master_environment=$(echo "$master_environments"| grep -v 'active' | head -n 2 | tail -n 1 | awk '{print $2}')
+          fi
+
+          # Delete the oldest master environment
+          contentful space environment delete --environment-id "$oldest_master_environment"
+
+      - name: Create new environment
+        run: |
+          TODAY=$(date +"%Y-%m-%d-%H-%M")
+          contentful space environment create --name master-$TODAY --environment-id master-$TODAY
+
+      - name: Build
+        run: npm run build
