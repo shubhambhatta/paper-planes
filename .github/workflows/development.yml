@@ -53,7 +53,7 @@ jobs:
 
           # If aliased and oldest master environments are the same, select the second oldest
           if [ "$aliased_master_environment" == "$oldest_master_environment" ]; then
-            oldest_master_environment=$(echo "$master_environments" | head -n 2 | tail -n 1 | awk '{print $2}')
+            oldest_master_environment=$(echo "$master_environments"| grep -v 'active' | head -n 2 | tail -n 1 | awk '{print $2}')
           fi
 
           # Delete the oldest master environment
