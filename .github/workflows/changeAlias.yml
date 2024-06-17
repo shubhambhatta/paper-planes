@@ -3,6 +3,8 @@ name: Change Alias CI
 on:
   push:
     branches: [main]
+    paths:
+      - "types/**"
 
 jobs:
   build:
