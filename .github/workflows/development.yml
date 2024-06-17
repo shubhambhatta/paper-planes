@@ -23,6 +23,10 @@ jobs:
       - name: Load Environment Variables
         run: echo "${{secrets.DEVELEOPMENT_SECERETS}}" > .env
 
+      - name: Set TODAY variable
+        id: set-today
+        run: echo "TODAY=$(date +"%Y-%m-%d-%H-%M")" >> $GITHUB_ENV
+
       - name: Install Contentful CLI
         run: npm install -g contentful-cli
 
@@ -62,7 +66,7 @@ jobs:
       - name: Create new environment
         run: |
           TODAY=$(date +"%Y-%m-%d-%H-%M")
-          contentful space environment create --name master-$TODAY --environment-id master-$TODAY
+          contentful space environment create --name master-$TODAY --environment-id master-$TODAY --source-environment-id master-2024-06-14-13-35
 
       - name: Build
         run: npm run build
