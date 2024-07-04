@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Merge models CI
 
 on:
   pull_request:
@@ -38,15 +38,16 @@ jobs:
         id: export_model
         run: |
           # Fetch the list of environments
+          TODAY=$(date +"%Y-%m-%d-%H-%M-%S")
           environments=$(contentful space environment list)
-
           master_environment=$(echo "$environments" | grep 'master' | sort)
           aliased_master_environment=$(echo "$master_environment" | grep 'active' | awk '{print $2}' | sed 's/\[active\]//g')
 
-          file=$(contentful merge export --te "$aliased_master_environment" --se master-2024-06-14-13-35)
+          file=$(contentful merge export --te "$aliased_master_environment" --se master-2024-06-14-13-35 -o /migrations/"$TODAY"_"$aliased_master_environment"_migration_script.js)
           migration_file_path=$(echo "$file" | sed -n 's/^.*exported to \(\/Users\/nextly\/migrations\/[^ ]*\)\..*$/\1/p')
-          echo "::set-output name=migration_file_path::$migration_file_path"
-          echo "::set-output name=aliased_master_environment::$aliased_master_environment"
+
+          echo "migration_file_path=$migration_file_path" >> $GITHUB_OUTPUT
+          echo "aliased_master_environment=$aliased_master_environment" >> $GITHUB_OUTPUT
 
       - name: Merge model changes
         run: contentful space  migration --yes --s ${{secrets.CONTENTFUL_SPACE_ID}} --e ${{ steps.export_model.outputs.aliased_master_environment }} ${{ steps.export_model.outputs.migration_file_path }}
