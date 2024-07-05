@@ -29,6 +29,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create migrations directory
+        run: mkdir -p ./migrations
+
       - name: Login to Contentful
         run: |
           contentful login --management-token ${{secrets.CONTENTFUL_CMA_TOKEN}} &&
@@ -43,7 +46,7 @@ jobs:
           master_environment=$(echo "$environments" | grep 'master' | sort)
           aliased_master_environment=$(echo "$master_environment" | grep 'active' | awk '{print $2}' | sed 's/\[active\]//g')
 
-          file=$(contentful merge export --te "$aliased_master_environment" --se master-2024-06-14-13-35 -o /migrations/"$TODAY"_"$aliased_master_environment"_migration_script.js)
+          file=$(contentful merge export --te "$aliased_master_environment" --se master-2024-06-14-13-35 -o ./migrations/"$TODAY"_"$aliased_master_environment"_migration_script.js)
           migration_file_path=$(echo "$file" | sed -n 's/^.*exported to \(\/Users\/nextly\/migrations\/[^ ]*\)\..*$/\1/p')
 
           echo "migration_file_path=$migration_file_path" >> $GITHUB_OUTPUT
