@@ -51,4 +51,4 @@ jobs:
           echo "aliased_master_environment=$aliased_master_environment" >> $GITHUB_OUTPUT
 
       - name: Merge model changes
-        run: contentful space  migration --yes --s ${{secrets.CONTENTFUL_SPACE_ID}} --e ${{ steps.export_model.outputs.aliased_master_environment }} ${{ steps.export_model.outputs.migration_file_path }}
+        run: contentful migration --yes --e ${{ steps.export_model.outputs.aliased_master_environment }} ${{ steps.export_model.outputs.migration_file_path }}
