@@ -26,9 +26,6 @@ jobs:
       - name: Install Contentful CLI
         run: npm install -g contentful-cli
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Create migrations directory
         run: mkdir -p ./migrations
 
@@ -55,6 +52,3 @@ jobs:
 
       - name: Merge model changes
         run: contentful space  migration --yes --s ${{secrets.CONTENTFUL_SPACE_ID}} --e ${{ steps.export_model.outputs.aliased_master_environment }} ${{ steps.export_model.outputs.migration_file_path }}
-
-      - name: Build
-        run: npm run build
